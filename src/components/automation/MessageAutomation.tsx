@@ -180,7 +180,7 @@ const MessageAutomation = () => {
                       rows={4}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Usa {{nombre}} para personalizar el mensaje con el nombre del usuario.
+                      Usa {"{{nombre}}"} para personalizar el mensaje con el nombre del usuario.
                     </p>
                   </div>
                 </CardContent>

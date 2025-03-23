@@ -410,7 +410,7 @@ const ContentScraper = () => {
                           rows={3}
                         />
                         <p className="text-xs text-muted-foreground">
-                          Usa {{keyword}} para insertar la palabra clave detectada y {{suggestion}} para una sugerencia generada.
+                          Usa {"{{keyword}}"} para insertar la palabra clave detectada y {"{{suggestion}}"} para una sugerencia generada.
                         </p>
                       </div>
                     )}
