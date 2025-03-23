@@ -65,7 +65,15 @@ const ContentScraper = () => {
     },
   ]);
 
-  const [newRule, setNewRule] = useState<Partial<ScrapingRule>>({
+  const [newRule, setNewRule] = useState<{
+    name: string;
+    targetUsers: string[];
+    frequency: "hourly" | "daily" | "weekly";
+    keywords: string[];
+    autoComment: boolean;
+    commentTemplate: string;
+    isActive: boolean;
+  }>({
     name: "",
     targetUsers: [],
     frequency: "daily",
@@ -78,20 +86,16 @@ const ContentScraper = () => {
   const [manualComment, setManualComment] = useState("");
 
   const handleAddRule = () => {
-    if (!newRule.name || !newRule.targetUsers?.length) return;
+    if (!newRule.name || newRule.targetUsers.length === 0) return;
     
     const newRuleItem: ScrapingRule = {
       id: `rule-${scrapingRules.length + 1}`,
-      name: newRule.name || "",
-      targetUsers: typeof newRule.targetUsers === 'string' 
-        ? newRule.targetUsers.split(',').map(user => user.trim()) 
-        : newRule.targetUsers || [],
-      frequency: newRule.frequency as "hourly" | "daily" | "weekly" || "daily",
-      keywords: typeof newRule.keywords === 'string'
-        ? newRule.keywords.split(',').map(keyword => keyword.trim())
-        : newRule.keywords || [],
-      autoComment: newRule.autoComment || false,
-      commentTemplate: newRule.commentTemplate || "",
+      name: newRule.name,
+      targetUsers: newRule.targetUsers,
+      frequency: newRule.frequency,
+      keywords: newRule.keywords,
+      autoComment: newRule.autoComment,
+      commentTemplate: newRule.commentTemplate,
       isActive: false,
     };
     
@@ -103,6 +107,7 @@ const ContentScraper = () => {
       keywords: [],
       autoComment: false,
       commentTemplate: "",
+      isActive: false,
     });
     
     toast({
@@ -151,6 +156,16 @@ const ContentScraper = () => {
         description: "Se han encontrado 2 nuevos contenidos.",
       });
     }, 3000);
+  };
+
+  const handleTargetUsersChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const usersArray = e.target.value.split(",").map(user => user.trim());
+    setNewRule({ ...newRule, targetUsers: usersArray });
+  };
+
+  const handleKeywordsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const keywordsArray = e.target.value.split(",").map(keyword => keyword.trim());
+    setNewRule({ ...newRule, keywords: keywordsArray });
   };
 
   return (
@@ -331,7 +346,7 @@ const ContentScraper = () => {
                       </label>
                       <Input
                         id="rule-name"
-                        value={newRule.name || ""}
+                        value={newRule.name}
                         onChange={(e) => setNewRule({ ...newRule, name: e.target.value })}
                         placeholder="Ej. Monitoreo de competidores"
                       />
@@ -343,8 +358,8 @@ const ContentScraper = () => {
                       </label>
                       <Textarea
                         id="target-users"
-                        value={Array.isArray(newRule.targetUsers) ? newRule.targetUsers.join(", ") : ""}
-                        onChange={(e) => setNewRule({ ...newRule, targetUsers: e.target.value.split(",").map(user => user.trim()) })}
+                        value={newRule.targetUsers.join(", ")}
+                        onChange={handleTargetUsersChange}
                         placeholder="@usuario1, @usuario2, @usuario3"
                         rows={2}
                       />
@@ -359,7 +374,7 @@ const ContentScraper = () => {
                       </label>
                       <Select
                         value={newRule.frequency}
-                        onValueChange={(value) => setNewRule({ ...newRule, frequency: value as any })}
+                        onValueChange={(value) => setNewRule({ ...newRule, frequency: value as "hourly" | "daily" | "weekly" })}
                       >
                         <SelectTrigger id="rule-frequency">
                           <SelectValue placeholder="Selecciona frecuencia" />
@@ -378,8 +393,8 @@ const ContentScraper = () => {
                       </label>
                       <Textarea
                         id="rule-keywords"
-                        value={Array.isArray(newRule.keywords) ? newRule.keywords.join(", ") : ""}
-                        onChange={(e) => setNewRule({ ...newRule, keywords: e.target.value.split(",").map(keyword => keyword.trim()) })}
+                        value={newRule.keywords.join(", ")}
+                        onChange={handleKeywordsChange}
                         placeholder="SEO, marketing, digital"
                         rows={2}
                       />
@@ -404,7 +419,7 @@ const ContentScraper = () => {
                         </label>
                         <Textarea
                           id="comment-template"
-                          value={newRule.commentTemplate || ""}
+                          value={newRule.commentTemplate}
                           onChange={(e) => setNewRule({ ...newRule, commentTemplate: e.target.value })}
                           placeholder="Interesante perspectiva sobre {{keyword}}. Has considerado también {{suggestion}}?"
                           rows={3}
@@ -419,7 +434,7 @@ const ContentScraper = () => {
                     <Button 
                       className="w-full"
                       onClick={handleAddRule}
-                      disabled={!newRule.name || !Array.isArray(newRule.targetUsers) || newRule.targetUsers.length === 0}
+                      disabled={!newRule.name || newRule.targetUsers.length === 0}
                     >
                       Guardar regla
                     </Button>
